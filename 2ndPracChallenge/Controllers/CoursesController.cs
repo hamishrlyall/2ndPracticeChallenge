@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using _2ndPracChallenge.Models;
+using _2ndPracChallenge.ViewModels;
 
 namespace _2ndPracChallenge.Controllers
 {
@@ -15,9 +16,28 @@ namespace _2ndPracChallenge.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Courses
-        public ActionResult Index()
+        public ActionResult Index(int? id, int? enrollmentID)
         {
-            return View(db.Courses.ToList());
+            /*var courses = db.Courses.Include(c => c.Enrollments);
+            return View(db.Courses.ToList());*/
+            var viewModel = new CourseIndexData();
+            viewModel.Courses = db.Courses
+                //.Include(c => c.Credits)
+                .Include(c => c.Enrollments.Select(e => e.Student))
+                .OrderBy(c => c.Title);
+            if (id != null)
+            {
+                ViewBag.CourseID = id.Value;
+                viewModel.Enrollments = viewModel.Courses.Where
+                    (c => c.CourseID == id.Value).Single().Enrollments;
+            }
+            if (enrollmentID != null)
+            {
+                ViewBag.EnrollmentId = enrollmentID.Value;
+                viewModel.Enrollments = viewModel.Courses.Where
+                    (x => x.CourseID == enrollmentID).Single().Enrollments;
+            }
+            return View(viewModel);
         }
 
         // GET: Courses/Details/5
