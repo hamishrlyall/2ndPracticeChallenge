@@ -16,6 +16,7 @@ namespace _2ndPracChallenge.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Courses
+        [Authorize]
         public ActionResult Index(int? id, int? enrollmentID)
         {
             /*var courses = db.Courses.Include(c => c.Enrollments);
